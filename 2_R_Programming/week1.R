@@ -205,7 +205,7 @@ x <- c(17, 14, 4, 5, 13, 12, 10)
 x[x >= 11] <- 4
 x
 #11
-d<-read.csv("hw1_data.csv")
+dat<-read.csv("hw1_data.csv")
 names(d)
 #12
 d[1:2,]

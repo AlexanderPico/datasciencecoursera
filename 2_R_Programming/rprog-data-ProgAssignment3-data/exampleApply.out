@@ -1,0 +1,12 @@
+sample.interval=20000
+"is.na" "apply" "funApply" 
+"aperm.default" "aperm" "apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"apply" "funApply" 
+"lapply" "unlist" "apply" "funApply" 
+"funApply" 
