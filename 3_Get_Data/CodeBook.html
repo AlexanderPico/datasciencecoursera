@@ -63,74 +63,48 @@ img {
 
 <div id="codebook-for-course-project-getting-and-cleaning-data" class="section level2">
 <h2>CodeBook for Course Project: Getting and Cleaning Data</h2>
-<p>Download and uncompress the data for the project into your local working directory: <a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a></p>
-<p>A full description is available at the site where the data was obtained: <a href="http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones" class="uri">http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones</a></p>
-<p>You should have a folder named “UCI HAR Dataset” in your working directory. Now run the R code in the following sections to process the files in this folder into a tidy dataset.</p>
-<div id="reading-data-sets" class="section level3">
-<h3>Reading data sets</h3>
-<p>The test and train datasets space-delimited tables without headers. They should have 561 columns.</p>
-<pre class="{r}"><code>ftest&lt;-&quot;UCI HAR Dataset/test/X_test.txt&quot;
-test&lt;-read.delim(ftest,sep=&quot;&quot;, header=F)
-
-
-ftrain&lt;-&quot;UCI HAR Dataset/train/X_train.txt&quot;
-train&lt;-read.delim(ftrain,sep=&quot;&quot;, header=F)</code></pre>
+<p>See either the output final_tidy.txt or execute the R code in run_analysis.R to generate a new tidy data set from the original UCI HAR Dataset found here: <a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a></p>
+<p>The description of the original dataset can be found here: <a href="http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones" class="uri">http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones</a></p>
+<div id="files" class="section level3">
+<h3>Files</h3>
+<ul>
+<li>run_analysis.R - R code to generate a new tidy dataset</li>
+<li>final_tidy.txt - the output of run_analysis.R</li>
+</ul>
 </div>
-<div id="add-descriptive-column-names" class="section level3">
-<h3>Add descriptive column names</h3>
-<p>The columns are given in the features.txt file.</p>
-<pre class="{r}"><code>fcols&lt;-&quot;UCI HAR Dataset/features.txt&quot;
-collabels&lt;-read.delim(fcols,sep=&quot;&quot;, header=F)
-colnames(test)&lt;-collabels[[2]]
-colnames(train)&lt;-collabels[[2]]</code></pre>
-</div>
-<div id="add-new-column-with-descriptive-activity-names" class="section level3">
-<h3>Add new column with descriptive activity names</h3>
-<p>The rows are coded in the corresponding “Y” files and decoded by the activity_labels.txt file.</p>
-<pre class="{r}"><code>ftestrows&lt;-&quot;UCI HAR Dataset/test/Y_test.txt&quot;
-testrows&lt;-read.delim(ftestrows,sep=&quot;&quot;, header=F)
-colnames(testrows)&lt;-&quot;id&quot;
-
-ftrainrows&lt;-&quot;UCI HAR Dataset/train/Y_train.txt&quot;
-trainrows&lt;-read.delim(ftrainrows,sep=&quot;&quot;, header=F)
-colnames(trainrows)&lt;-&quot;id&quot;
-
-frows&lt;-&quot;UCI HAR Dataset/activity_labels.txt&quot;
-rowlabels&lt;-read.delim(frows,sep=&quot;&quot;, header=F)
-colnames(rowlabels)&lt;-c(&quot;id&quot;,&quot;label&quot;)
-
-library(plyr)
-testrowlabels&lt;-join(testrows,rowlabels,by=&quot;id&quot;)
-test$activityLabel&lt;-testrowlabels[[2]]
-
-trainrowlabels&lt;-join(trainrows,rowlabels,by=&quot;id&quot;)
-train$activityLabel&lt;-trainrowlabels[[2]]</code></pre>
-</div>
-<div id="add-new-column-with-subject-code" class="section level3">
-<h3>Add new column with subject code</h3>
-<pre class="{r}"><code>ftestsubs&lt;-&quot;UCI HAR Dataset/test/subject_test.txt&quot;
-testsubs&lt;-read.delim(ftestsubs,sep=&quot;&quot;, header=F)
-test$subjectId&lt;-testsubs[[1]]
-
-ftrainsubs&lt;-&quot;UCI HAR Dataset/train/subject_train.txt&quot;
-trainsubs&lt;-read.delim(ftrainsubs,sep=&quot;&quot;, header=F)
-train$subjectId&lt;-trainsubs[[1]]
-</code></pre>
-</div>
-<div id="merge-test-and-train" class="section level3">
-<h3>Merge test and train</h3>
-<p>They have identical columns, so just combine the rows.</p>
-<pre class="{r}"><code>combo&lt;-rbind(test,train)</code></pre>
-<p>?rbind ### Extract only mean and stdev columns These are the first 6 columns of every XYZ set of features (+40, +79) and the first 2 columns of every Mag set of features (+13), and each of the angle features. Plus keep final columns with activityLabel and subjectId</p>
-<pre class="{r}"><code>tidy1&lt;-combo[,c(1:6,41:46,81:86,121:126,161:166,201:202,214:215,227:228,240:241,253:254,266:271,345:350,424:429,503:504,516:517,529:530,542:543,555:563)]
-colnames(tidy1)</code></pre>
-</div>
-<div id="generate-new-tidy-data-set-with-averages-of-each-variable-for-each-activity-and-each-subject" class="section level3">
-<h3>Generate new tidy data set with averages of each variable for each activity and each subject</h3>
-<p>Use aggregate function to perform mean() on each column based on unique grouping of activtyLabel and subjectID (i.e., the last two columns).</p>
-<pre class="{r}"><code>tidy2&lt;-aggregate(tidy1[,1:73],list(tidy1$activityLabel,tidy1$subjectId) ,mean)</code></pre>
-<p>This will generate a new tidy data set with unique groups defined in the first two columns followed by means of all the other columns. There are 6 activity types and 30 subjects, so the new tidy data set should have 180 rows.</p>
-<p>Enjoy!</p>
+<div id="tidy-dataset" class="section level3">
+<h3>Tidy dataset</h3>
+<p>There are 75 columns in the new tidy dataset. The first 2 columns identify groups based on:</p>
+<ol style="list-style-type: decimal">
+<li>Group.1 = Activity (6 types)</li>
+<li>Group.2 = Subject identifier (1-30)</li>
+</ol>
+<p>The other 73 columns are means of the original mean() and std() for the following measurements:</p>
+<ul>
+<li>tBodyAcc-XYZ</li>
+<li>tGravityAcc-XYZ</li>
+<li>tBodyAccJerk-XYZ</li>
+<li>tBodyGyro-XYZ</li>
+<li>tBodyGyroJerk-XYZ</li>
+<li>tBodyAccMag</li>
+<li>tGravityAccMag</li>
+<li>tBodyAccJerkMag</li>
+<li>tBodyGyroMag</li>
+<li>tBodyGyroJerkMag</li>
+<li>fBodyAcc-XYZ</li>
+<li>fBodyAccJerk-XYZ</li>
+<li>fBodyGyro-XYZ</li>
+<li>fBodyAccMag</li>
+<li>fBodyAccJerkMag</li>
+<li>fBodyGyroMag</li>
+<li>fBodyGyroJerkMag</li>
+<li>angle(XYZ,gravityMean)</li>
+<li>angle(tBodyAccMean)</li>
+<li>angle(tBodyAccJerkMean)</li>
+<li>angle(tBodyGyroMean)</li>
+<li>angle(tBodyGyroJerkMean)</li>
+</ul>
+<p>See the original documentation in UCI HAR Datasets for additional details.</p>
 </div>
 </div>
 
